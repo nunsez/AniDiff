@@ -24,6 +24,7 @@ defmodule Anisync.MixProject do
     [
       {:finch, "~> 0.14"},
       {:jason, "~> 1.4"},
+      {:floki, "~> 0.34.2"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.2", only: [:dev], runtime: false}
     ]

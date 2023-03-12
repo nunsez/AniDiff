@@ -1,8 +1,8 @@
-defmodule AnisyncTest do
+defmodule AnidiffTest do
   use ExUnit.Case
-  doctest Anisync
+  doctest Anidiff
 
   test "greets the world" do
-    assert Anisync.hello() == :world
+    assert Anidiff.hello() == :world
   end
 end

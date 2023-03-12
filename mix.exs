@@ -1,9 +1,9 @@
-defmodule Anisync.MixProject do
+defmodule Anidiff.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :anisync,
+      app: :anidiff,
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule Anisync.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Anisync.Application, []}
+      mod: {Anidiff.Application, []}
     ]
   end
 

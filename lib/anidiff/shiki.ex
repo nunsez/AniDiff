@@ -20,7 +20,7 @@ defmodule Anidiff.Shiki do
   def fetch(url, http_client) do
     url
     |> http_client.get()
-    |> then(&(&1.body))
+    |> then(& &1.body)
     |> Json.parse()
   end
 end

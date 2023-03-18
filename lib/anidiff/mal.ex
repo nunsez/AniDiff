@@ -30,9 +30,9 @@ defmodule Anidiff.Mal do
 
   def profile_doc(http_client \\ Http) do
     Env.mal_username()
-    |> then(&("https://myanimelist.net/profile/#{&1}"))
+    |> then(&"https://myanimelist.net/profile/#{&1}")
     |> http_client.get()
-    |> then(&(&1.body))
+    |> then(& &1.body)
     |> Html.parse()
   end
 
@@ -90,7 +90,7 @@ defmodule Anidiff.Mal do
   def fetch_chunk(url, http_client) do
     url
     |> http_client.get()
-    |> then(&(&1.body))
+    |> then(& &1.body)
     |> Json.parse()
   end
 end

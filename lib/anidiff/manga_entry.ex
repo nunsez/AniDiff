@@ -11,7 +11,18 @@ defmodule Anidiff.MangaEntry do
     :source
   ]
 
+  @type t() :: %__MODULE__{
+          id: pos_integer(),
+          title: String.t(),
+          status: integer(),
+          score: integer(),
+          chapters_read: non_neg_integer(),
+          volumes_read: non_neg_integer(),
+          source: :shiki | :mal
+        }
+
   # Mal constructor
+  @spec new(map()) :: t()
   def new(%{
         "manga_id" => id,
         "manga_title" => title,
@@ -53,6 +64,7 @@ defmodule Anidiff.MangaEntry do
     }
   end
 
+  @spec equals?(t(), t()) :: boolean()
   def equals?(a, b) when is_struct(a, __MODULE__) and is_struct(b, __MODULE__) do
     (a.chapters_read == b.chapters_read or a.volumes_read == b.volumes_read) and
       a.status == b.status and
@@ -61,6 +73,7 @@ defmodule Anidiff.MangaEntry do
 
   def equals?(_, _), do: false
 
+  @spec format_status(any()) :: String.t()
   defp format_status(1), do: "watching"
   defp format_status(2), do: "completed"
   defp format_status(3), do: "on_hold"

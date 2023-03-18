@@ -6,6 +6,7 @@ defmodule Anidiff.Comparator do
   alias Anidiff.Mal
   alias Anidiff.Shiki
 
+  @spec anime() :: [AnimeEntry.t()]
   def anime do
     mal_entries =
       Mal.anime_list()
@@ -26,6 +27,7 @@ defmodule Anidiff.Comparator do
     Enum.uniq_by(mal_diff ++ shiki_diff, fn e -> e.id end)
   end
 
+  @spec manga() :: [MangaEntry.t()]
   def manga do
     mal_entries =
       Mal.manga_list()
@@ -46,6 +48,10 @@ defmodule Anidiff.Comparator do
     Enum.uniq_by(mal_diff ++ shiki_diff, fn e -> e.id end)
   end
 
+  @spec compare(
+          {pos_integer(), AnimeEntry.t() | MangaEntry.t()},
+          %{pos_integer() => AnimeEntry.t()} | %{pos_integer() => MangaEntry.t()}
+        ) :: AnimeEntry.t() | MangaEntry.t() | nil
   def compare({anime_id, entry}, other_entries) when is_struct(entry, AnimeEntry) do
     equal_result =
       other_entries
@@ -64,6 +70,7 @@ defmodule Anidiff.Comparator do
     if equal_result, do: nil, else: entry
   end
 
+  @spec to_list(Enumerable.t()) :: [AnimeEntry.t()] | [MangaEntry.t()]
   def to_list(stream) do
     stream
     |> Stream.map(fn {:ok, term} -> term end)
@@ -71,6 +78,8 @@ defmodule Anidiff.Comparator do
     |> Enum.to_list()
   end
 
+  @spec to_map_as(String.t(), module()) ::
+          %{pos_integer() => AnimeEntry.t()} | %{pos_integer() => MangaEntry.t()}
   def to_map_as(string, struct) do
     string
     |> Enum.map(&struct.new/1)

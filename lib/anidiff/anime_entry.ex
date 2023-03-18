@@ -10,7 +10,17 @@ defmodule Anidiff.AnimeEntry do
     :source
   ]
 
+  @type t() :: %__MODULE__{
+          id: pos_integer(),
+          title: String.t(),
+          status: integer(),
+          score: integer(),
+          episodes_watched: non_neg_integer(),
+          source: :shiki | :mal
+        }
+
   # Mal constructor
+  @spec new(map()) :: t()
   def new(%{
         "anime_id" => id,
         "anime_title" => title,
@@ -48,6 +58,7 @@ defmodule Anidiff.AnimeEntry do
     }
   end
 
+  @spec equals?(t(), t()) :: boolean()
   def equals?(a, b) when is_struct(a, __MODULE__) and is_struct(b, __MODULE__) do
     a.status == b.status and
       a.score == b.score and
@@ -56,6 +67,7 @@ defmodule Anidiff.AnimeEntry do
 
   def equals?(_, _), do: false
 
+  @spec format_status(any()) :: String.t()
   defp format_status(1), do: "watching"
   defp format_status(2), do: "completed"
   defp format_status(3), do: "on_hold"

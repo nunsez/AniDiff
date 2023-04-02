@@ -78,10 +78,10 @@ defmodule Anidiff.Comparator do
     |> Enum.to_list()
   end
 
-  @spec to_map_as(String.t(), module()) ::
+  @spec to_map_as([map()], module()) ::
           %{pos_integer() => AnimeEntry.t()} | %{pos_integer() => MangaEntry.t()}
-  def to_map_as(string, struct) do
-    string
+  def to_map_as(map_list, struct) do
+    map_list
     |> Enum.map(&struct.new/1)
     |> Enum.into(%{}, fn e -> {e.id, e} end)
   end

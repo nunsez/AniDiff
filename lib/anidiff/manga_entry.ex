@@ -29,7 +29,7 @@ defmodule Anidiff.MangaEntry do
         "status" => status,
         "score" => score,
         "num_read_chapters" => chapters_read,
-        "manga_num_volumes" => volumes_read
+        "num_read_volumes" => volumes_read
       })
       when not is_nil(id) do
     %__MODULE__{

@@ -5,16 +5,18 @@ defmodule Anidiff.Shiki do
   alias Anidiff.Http
   alias Anidiff.Json
 
+  @shikimori_prefix "https://shikimori.me"
+
   @spec anime_list() :: [map()]
   def anime_list do
-    url = "https://shikimori.one/#{Env.shiki_username()}/list_export/animes.json"
+    url = "#{@shikimori_prefix}/#{Env.shiki_username()}/list_export/animes.json"
 
     fetch(url, Http)
   end
 
   @spec manga_list() :: [map()]
   def manga_list do
-    url = "https://shikimori.one/#{Env.shiki_username()}/list_export/mangas.json"
+    url = "#{@shikimori_prefix}/#{Env.shiki_username()}/list_export/mangas.json"
 
     fetch(url, Http)
   end

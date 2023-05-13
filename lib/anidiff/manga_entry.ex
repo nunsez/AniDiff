@@ -65,8 +65,8 @@ defmodule Anidiff.MangaEntry do
   end
 
   @spec equals?(t(), t()) :: boolean()
-  def equals?(a, b) when is_struct(a, __MODULE__) and is_struct(b, __MODULE__) do
     (a.chapters_read == b.chapters_read or a.volumes_read == b.volumes_read) and
+  def equals?(%__MODULE__{} = a, %__MODULE__{} = b) do
       a.status == b.status and
       a.score == b.score
   end

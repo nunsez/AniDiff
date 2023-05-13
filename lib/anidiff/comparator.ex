@@ -52,7 +52,7 @@ defmodule Anidiff.Comparator do
           {pos_integer(), AnimeEntry.t() | MangaEntry.t()},
           %{pos_integer() => AnimeEntry.t()} | %{pos_integer() => MangaEntry.t()}
         ) :: AnimeEntry.t() | MangaEntry.t() | nil
-  def compare({anime_id, entry}, other_entries) when is_struct(entry, AnimeEntry) do
+  def compare({anime_id, %AnimeEntry{} = entry}, other_entries) do
     equal_result =
       other_entries
       |> Map.get(anime_id)
@@ -61,7 +61,7 @@ defmodule Anidiff.Comparator do
     if equal_result, do: nil, else: entry
   end
 
-  def compare({manga_id, entry}, other_entries) when is_struct(entry, MangaEntry) do
+  def compare({manga_id, %MangaEntry{} = entry}, other_entries) do
     equal_result =
       other_entries
       |> Map.get(manga_id)

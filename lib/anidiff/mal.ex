@@ -4,7 +4,6 @@ defmodule Anidiff.Mal do
   alias Anidiff.Env
   alias Anidiff.Http
   alias Anidiff.Html
-  alias Anidiff.Json
 
   @mal_prefix "https://myanimelist.net"
 
@@ -88,23 +87,21 @@ defmodule Anidiff.Mal do
 
   @spec anime_list_chunk(non_neg_integer(), module()) :: [map()]
   def anime_list_chunk(offset, http_client \\ Http) do
-    url = "#{@mal_prefix}/animelist/#{Env.mal_username()}/load.json?offset=#{offset}"
+    url = "#{@mal_prefix}/animelist/#{Env.mal_username()}/load.json?offset=#{offset}&status=7"
 
     fetch_chunk(url, http_client)
   end
 
   @spec manga_list_chunk(non_neg_integer(), module()) :: [map()]
   def manga_list_chunk(offset, http_client \\ Http) do
-    url = "#{@mal_prefix}/mangalist/#{Env.mal_username()}/load.json?offset=#{offset}"
+    url = "#{@mal_prefix}/mangalist/#{Env.mal_username()}/load.json?offset=#{offset}&status=7"
 
     fetch_chunk(url, http_client)
   end
 
   @spec fetch_chunk(String.t(), module()) :: [map()]
   def fetch_chunk(url, http_client) do
-    url
-    |> http_client.get()
-    |> then(& &1.body)
-    |> Json.parse()
+    response = http_client.get(url)
+    JSON.decode!(response.body)
   end
 end

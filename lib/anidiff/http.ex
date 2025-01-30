@@ -1,8 +1,6 @@
 defmodule Anidiff.Http do
   @moduledoc false
 
-  alias Anidiff.Json
-
   @type response() :: map()
 
   @spec get(String.t()) :: response()
@@ -20,7 +18,7 @@ defmodule Anidiff.Http do
 
   @spec post(String.t(), map()) :: response()
   def post(url, data) do
-    body = Json.generate(data)
+    body = JSON.encode!(data)
 
     headers = [
       {"content-type", "application/json"}

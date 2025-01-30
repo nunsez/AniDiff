@@ -3,9 +3,8 @@ defmodule Anidiff.Shiki do
 
   alias Anidiff.Env
   alias Anidiff.Http
-  alias Anidiff.Json
 
-  @shikimori_prefix "https://shikimori.me"
+  @shikimori_prefix "https://shikimori.one"
 
   @spec anime_list() :: [map()]
   def anime_list do
@@ -23,9 +22,7 @@ defmodule Anidiff.Shiki do
 
   @spec fetch(String.t(), module()) :: [map()]
   def fetch(url, http_client) do
-    url
-    |> http_client.get()
-    |> then(& &1.body)
-    |> Json.parse()
+    response = http_client.get(url)
+    JSON.decode!(response.body)
   end
 end

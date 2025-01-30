@@ -5,20 +5,39 @@ defmodule Anidiff.Release do
 
   @app :anidiff
 
+  def main(args \\ []) do
+    System.no_halt(true)
+
+    case args do
+      ["anime" | _] ->
+        diff_anime()
+
+      ["manga" | _] ->
+        diff_manga()
+
+      [] ->
+        diff_anime()
+        diff_manga()
+
+      _ ->
+        IO.puts("Available arguments: anime, manga or no arg")
+    end
+
+    System.stop(0)
+  end
+
   @spec diff_anime() :: any()
   def diff_anime do
     start_app()
 
-    Comparator.anime()
-    |> report()
+    report(Comparator.anime())
   end
 
   @spec diff_manga() :: any()
   def diff_manga do
     start_app()
 
-    Comparator.manga()
-    |> report()
+    report(Comparator.manga())
   end
 
   @spec start_app() :: :ok | {:error, any()}

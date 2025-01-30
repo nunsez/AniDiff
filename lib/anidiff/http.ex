@@ -3,20 +3,23 @@ defmodule Anidiff.Http do
 
   @type response() :: map()
 
-  @spec get(String.t()) :: response()
+  @callback get(String.t()) :: response()
+
+  @callback post(String.t(), map()) :: response()
+
+  @behaviour __MODULE__
+
+  @impl __MODULE__
   def get(url) do
     headers = [
       {"content-type", "text/html"}
     ]
 
     request = Finch.build(:get, url, headers)
-
-    {:ok, response} = Finch.request(request, MyFinch)
-
-    response
+    Finch.request!(request, MyFinch)
   end
 
-  @spec post(String.t(), map()) :: response()
+  @impl __MODULE__
   def post(url, data) do
     body = JSON.encode!(data)
 
@@ -25,9 +28,6 @@ defmodule Anidiff.Http do
     ]
 
     request = Finch.build(:post, url, headers, body)
-
-    {:ok, response} = Finch.request(request, MyFinch)
-
-    response
+    Finch.request!(request, MyFinch)
   end
 end

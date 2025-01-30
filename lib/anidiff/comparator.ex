@@ -6,71 +6,48 @@ defmodule Anidiff.Comparator do
   alias Anidiff.Mal
   alias Anidiff.Shiki
 
-  @spec anime() :: [AnimeEntry.t()]
+  @type entry() :: map()
+
+  @type entry_eql() :: (entry(), entry() -> boolean())
+
+  @spec anime() :: [entry()]
   def anime do
-    mal_entries =
-      Mal.anime_list()
-      |> to_map_as(AnimeEntry)
-
-    shiki_entries =
-      Shiki.anime_list()
-      |> to_map_as(AnimeEntry)
-
-    mal_diff =
-      Task.async_stream(mal_entries, &compare(&1, shiki_entries))
-      |> to_list()
-
-    shiki_diff =
-      Task.async_stream(shiki_entries, &compare(&1, mal_entries))
-      |> to_list()
-
-    Enum.uniq_by(mal_diff ++ shiki_diff, fn e -> e.id end)
+    mal_entries = to_map_as(Mal.anime_list(), AnimeEntry)
+    shiki_entries = to_map_as(Shiki.anime_list(), AnimeEntry)
+    uniq_diff(mal_entries, shiki_entries, &AnimeEntry.equals?/2)
   end
 
-  @spec manga() :: [MangaEntry.t()]
+  @spec manga() :: [entry()]
   def manga do
-    mal_entries =
-      Mal.manga_list()
-      |> to_map_as(MangaEntry)
-
-    shiki_entries =
-      Shiki.manga_list()
-      |> to_map_as(MangaEntry)
-
-    mal_diff =
-      Task.async_stream(mal_entries, &compare(&1, shiki_entries))
-      |> to_list()
-
-    shiki_diff =
-      Task.async_stream(shiki_entries, &compare(&1, mal_entries))
-      |> to_list()
-
-    Enum.uniq_by(mal_diff ++ shiki_diff, fn e -> e.id end)
+    mal_entries = to_map_as(Mal.manga_list(), MangaEntry)
+    shiki_entries = to_map_as(Shiki.manga_list(), MangaEntry)
+    uniq_diff(mal_entries, shiki_entries, &MangaEntry.equals?/2)
   end
 
-  @spec compare(
-          {pos_integer(), AnimeEntry.t() | MangaEntry.t()},
-          %{pos_integer() => AnimeEntry.t()} | %{pos_integer() => MangaEntry.t()}
-        ) :: AnimeEntry.t() | MangaEntry.t() | nil
-  def compare({anime_id, %AnimeEntry{} = entry}, other_entries) do
-    equal_result =
-      other_entries
-      |> Map.get(anime_id)
-      |> AnimeEntry.equals?(entry)
-
-    if equal_result, do: nil, else: entry
+  @spec uniq_diff(%{pos_integer() => entry()}, %{pos_integer() => entry()}, entry_eql()) ::
+          [map()]
+  def uniq_diff(entries1, entries2, test) do
+    diff1 = diff(entries1, entries2, test)
+    diff2 = diff(entries2, entries1, test)
+    Enum.uniq_by(diff1 ++ diff2, fn e -> e.id end)
   end
 
-  def compare({manga_id, %MangaEntry{} = entry}, other_entries) do
-    equal_result =
-      other_entries
-      |> Map.get(manga_id)
-      |> MangaEntry.equals?(entry)
-
-    if equal_result, do: nil, else: entry
+  @spec diff(%{pos_integer() => entry()}, %{pos_integer() => entry()}, entry_eql()) :: [entry()]
+  def diff(entries1, entries2, test) do
+    entries1
+    |> Task.async_stream(fn entry1 -> compare(entry1, entries2, test) end)
+    |> to_list()
   end
 
-  @spec to_list(Enumerable.t()) :: [AnimeEntry.t()] | [MangaEntry.t()]
+  @spec compare({pos_integer(), entry()}, %{pos_integer() => entry()}, entry_eql()) ::
+          entry() | nil
+  def compare({entry_id, entry}, other_entries, test) do
+    other_entry = Map.get(other_entries, entry_id)
+
+    if not test.(entry, other_entry), do: entry
+  end
+
+  @spec to_list(Enumerable.t()) :: [entry()]
   def to_list(stream) do
     stream
     |> Stream.map(fn {:ok, term} -> term end)
@@ -78,8 +55,7 @@ defmodule Anidiff.Comparator do
     |> Enum.to_list()
   end
 
-  @spec to_map_as([map()], module()) ::
-          %{pos_integer() => AnimeEntry.t()} | %{pos_integer() => MangaEntry.t()}
+  @spec to_map_as([entry()], module()) :: %{pos_integer() => entry()}
   def to_map_as(map_list, struct) do
     map_list
     |> Enum.map(&struct.new/1)

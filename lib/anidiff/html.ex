@@ -2,7 +2,9 @@ defmodule Anidiff.Html do
   @moduledoc false
 
   @type html_tree() :: Floki.html_tree()
+
   @type html_node() :: Floki.html_node()
+
   @type document() :: html_tree() | html_node()
 
   @spec parse(String.t()) :: html_tree()
@@ -32,10 +34,5 @@ defmodule Anidiff.Html do
       [value | _] -> value
       _ -> nil
     end
-  end
-
-  @spec attr(document(), String.t(), String.t(), (String.t() -> String.t())) :: document()
-  def attr(document, selector, attribute, func) do
-    Floki.attr(document, selector, attribute, func)
   end
 end

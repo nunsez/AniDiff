@@ -9,35 +9,25 @@ defmodule Anidiff.Mal do
 
   @spec anime_list() :: [map()]
   def anime_list do
-    offsets =
-      profile_doc()
-      |> anime_total()
-      |> offsets()
-
-    Task.async_stream(offsets, &anime_list_chunk(&1))
-    |> Stream.flat_map(fn {:ok, list} -> list end)
-    |> Enum.into([])
+    profile_doc()
+    |> anime_total()
+    |> offsets()
+    |> collect(&anime_list_chunk/1)
   end
 
   @spec manga_list() :: [map()]
   def manga_list do
-    offsets =
-      profile_doc()
-      |> manga_total()
-      |> offsets()
-
-    Task.async_stream(offsets, &manga_list_chunk(&1))
-    |> Stream.flat_map(fn {:ok, list} -> list end)
-    |> Enum.into([])
+    profile_doc()
+    |> manga_total()
+    |> offsets()
+    |> collect(&manga_list_chunk/1)
   end
 
   @spec profile_doc(module()) :: Html.document()
   def profile_doc(http_client \\ Http) do
-    Env.mal_username()
-    |> then(&"#{@mal_prefix}/profile/#{&1}")
-    |> http_client.get()
-    |> then(& &1.body)
-    |> Html.parse()
+    url = "#{@mal_prefix}/profile/#{Env.mal_username()}"
+    response = http_client.get(url)
+    Html.parse(response.body)
   end
 
   @spec anime_total(Html.document()) :: non_neg_integer()
@@ -103,5 +93,12 @@ defmodule Anidiff.Mal do
   def fetch_chunk(url, http_client) do
     response = http_client.get(url)
     JSON.decode!(response.body)
+  end
+
+  @spec collect([integer()], (integer() -> [map()])) :: [map()]
+  def collect(offsets, fun) do
+    Task.async_stream(offsets, fun)
+    |> Stream.flat_map(fn {:ok, list} -> list end)
+    |> Enum.into([])
   end
 end
